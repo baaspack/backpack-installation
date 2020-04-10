@@ -1,0 +1,111 @@
+# inspired by https://github.com/BretFisher/node-docker-good-defaults
+
+version: '3.7'
+
+services:
+  admin-backend:
+    image: baaspack/backpack-admin-backend
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=proxy
+        - traefik.http.services.admin-backend.loadbalancer.server.port=3000
+        - traefik.http.routers.admin-backend.rule=Host(`admin-be.${DOMAIN}`)
+        - traefik.http.routers.admin-backend.tls.certresolver=le
+      update_config:
+        failure_action: rollback
+        order: start-first
+    environment:
+      - DB_USERNAME=baas
+      - DB_PASSWORD=aLongAndComplicatedSecret
+      - DB_HOSTNAME=postgres
+      - DB_DBNAME=baas_admin
+      - REDIS_HOSTNAME=redis
+      - SESSION_SECRET=aSuperSecureString
+      - DOMAIN=${DOMAIN}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - admin-backend
+      - proxy
+
+  admin-frontend:
+    image: baaspack/backpack-admin-frontend
+    deploy:
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=proxy
+        - traefik.http.services.admin-frontend.loadbalancer.server.port=80
+        - traefik.http.routers.admin-frontend.rule=Host(`admin.${DOMAIN}`)
+        - traefik.http.routers.admin-frontend.tls.certresolver=le
+      update_config:
+        failure_action: rollback
+        order: start-first
+    networks:
+      - proxy
+
+  postgres:
+    image: postgres:12.2-alpine
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - admin-backend
+    environment:
+      - POSTGRES_USER=baas
+      - POSTGRES_PASSWORD=aLongAndComplicatedSecret
+      - POSTGRES_DB=baas_admin
+    healthcheck:
+      test: pg_isready -U baas -d baas_admin -h 127.0.0.1
+
+  redis:
+    image: redis:alpine
+    healthcheck:
+      test: redis-cli ping
+    networks:
+      - admin-backend
+
+  reverse-proxy:
+    image: traefik:v2.2
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+    command:
+      - --providers.docker.swarmMode=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.http.tls=true
+      - --certificatesresolvers.le.acme.tlsChallenge=true
+      - --certificatesresolvers.le.acme.storage=/etc/traefik/acme/acme.json
+      - --certificatesresolvers.le.acme.email=${SSL_EMAIL}
+    ports:
+      - target: 80
+        published: 80
+      - target: 443
+        published: 443
+    volumes:
+      - acme:/etc/traefik/acme
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - proxy
+
+volumes:
+  db-data:
+  acme:
+
+networks:
+  admin-backend:
+    name: admin-backend
+  proxy:
+    name: proxy
