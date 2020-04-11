@@ -38,6 +38,9 @@ services:
 
   admin-frontend:
     image: baaspack/backpack-admin-frontend
+    configs:
+      - source: nginx-static
+        target: /etc/nginx/nginx.conf
     deploy:
       replicas: 1
       labels:
@@ -109,3 +112,7 @@ networks:
     name: admin-backend
   proxy:
     name: proxy
+
+configs:
+  nginx-static:
+    external: true
