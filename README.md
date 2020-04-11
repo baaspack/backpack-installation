@@ -5,7 +5,7 @@
 2. Configure the following DNS A record for the VPS's public IP address: *.yourdomain.
 
 3. Install Docker on the VPS.
-  - curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh
+  - `curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh`
 
 4. Initialize Swarm mode on the VPS by running `docker swarm init`.
   - You may need to run this command with the `--advertise-addr` option if the VPS has multiple IP addresses. Choose the public one. The full command will look like `docker swarm init --advertise-addr pub.lic.ip.add`
