@@ -115,4 +115,5 @@ networks:
 
 configs:
   nginx-static:
-    external: true
+    file: ./nginx.conf
+    name: nginx-static
