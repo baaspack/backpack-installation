@@ -75,7 +75,7 @@ services:
     networks:
       - admin-backend
 
-  reverse-proxy:
+  traefik:
     image: traefik:v2.2
     deploy:
       placement:
