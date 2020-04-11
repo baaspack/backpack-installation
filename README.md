@@ -22,4 +22,6 @@
 
 8. After a few minutes, see if you can hit https://admin.yourdomain.tld from your browser.
 
-OPTIONAL BUT RECOMMENDED: add more nodes to your swarm.
+OPTIONAL BUT RECOMMENDED:
+  - add more nodes to your swarm.
+  - secure your nodes' firewalls by following [these instructions](https://www.digitalocean.com/community/tutorials/how-to-configure-the-linux-firewall-for-docker-swarm-on-ubuntu-16-04). Don't forget to allow traffic through ports 443 & 80 for HTTP/S.
