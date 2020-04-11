@@ -3,7 +3,7 @@
 version: '3.7'
 
 services:
-  admin-backend:
+  backend:
     image: baaspack/backpack-admin-backend
     deploy:
       placement:
@@ -28,6 +28,7 @@ services:
       - SESSION_SECRET=aSuperSecureString
       - DOMAIN=${DOMAIN}
     volumes:
+      - frontends:/opt/node_app/app/uploads
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - postgres
@@ -36,7 +37,7 @@ services:
       - admin-backend
       - proxy
 
-  admin-frontend:
+  frontend:
     image: baaspack/backpack-admin-frontend
     configs:
       - source: nginx-static
@@ -104,6 +105,8 @@ services:
       - proxy
 
 volumes:
+  frontends:
+    name: frontends
   db-data:
   acme:
 
