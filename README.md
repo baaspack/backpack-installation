@@ -12,7 +12,7 @@
 
 5. Download backpack's installation scripts by running `git clone https://github.com/baaspack/backpack-installation.git`.
 
-6. Update the `.env` file in the `backpack-installation` file:
+6. From within the `backpack-installation` folder, update the `.env` file:
   - Fill in the domain name you used in Step 2 into the DOMAIN variable.
   - Fill in the email address you used to register your domain name in the SSL_EMAIL variable.
 
