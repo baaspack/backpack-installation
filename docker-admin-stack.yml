@@ -93,8 +93,6 @@ services:
       - --certificatesresolvers.le.acme.tlsChallenge=true
       - --certificatesresolvers.le.acme.storage=/etc/traefik/acme/acme.json
       - --certificatesresolvers.le.acme.email=${SSL_EMAIL}
-      - --traefik.http.middlewares.corsHeaders.headers.accesscontrolallowmethods=GET,OPTIONS
-      - --traefik.http.middlewares.corsHeaders.headers.accesscontrolalloworiginlist=https://admin.${DOMAIN}, http://localhost/
     ports:
       - target: 80
         published: 80
